@@ -1,5 +1,4 @@
 let addToy = false;
-
 const toyCollection = document.getElementById('toy-collection')
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,11 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-
 // need fetch, after fetch req. add to DOM
 fetch('http://localhost:3000/toys')
 .then(response => response.json())
-.then(json => gotToys(json)) //callback funt. need def of fun. 
+.then(json => gotToys(json)) //callback function need def of func. 
 // .then(gotToys) json gets passed as arg automatically
 
 function gotToys(toys) {
@@ -42,7 +40,6 @@ function createCard(toy) {
   image.classList.add('toy-avatar')
   image.src = toy.image
 
-  //debugger
   const para = document.createElement('p')
   para.innerText = `${toy.likes} Likes`
 
@@ -55,5 +52,36 @@ function createCard(toy) {
   card.appendChild(image)
   card.appendChild(para)
   card.appendChild(button)
+}
 
+function updateLike(e, toy){
+  // needs to increase by every click & capture how many likes there are
+  // update innerText & our database
+  let likes = toy.likes
+  likes++;
+  toy.likes = likes
+  e.target.parentElement.querySelector('p').innerText = `${likes} likes`
+}
+  
+  //fetch post to /toys
+function createToy(toy) {
+  fetch(`http://localhost:3000/items/${id}`, configObj)
+  .then(r => r.json())
+  .then(json => alert(json.message))
+}
+
+
+const toyInfo = {
+  "name": toy.name.value,
+  "image": toy.image.value,
+  "likes": toy.likes.value
+}
+
+const configObj = {
+  method: 'POST',
+  headers: {
+     "Content-Type": "application/json",
+     Accept: "application/json"
+  },
+  body: JSON.stringify(toyInfo)
 }
