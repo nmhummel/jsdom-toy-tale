@@ -1,9 +1,11 @@
 let addToy = false;
 const toyCollection = document.getElementById('toy-collection')
+const sortByLikes = document.getElementById("sort-by-likes")
 
 document.addEventListener("DOMContentLoaded", () => {
   addToyForm()
-  gotToys()
+  //gotToys()
+  sortByLikes.addEventListener("click", () => Toy.sortLikes())
   const toyForm = document.querySelector(".add-toy-form")
   toyForm.addEventListener('submit', createToy)
 });  
@@ -29,7 +31,13 @@ fetch('http://localhost:3000/toys')
 // .then(gotToys) json gets passed as arg automatically
 
 function gotToys(toys) {
-  toys.forEach(toy => { createCard(toy) });
+  console.log(toys)
+  toys.forEach(toy => { 
+    // instantiate a new toy object
+    let t = new Toy(toy) // = new Toy(toy.name, toy.image, toy.likes, toy.id) 
+    // add to DOM on toy
+    t.createCard()
+  });
 };
 
 function createToy(event) {
@@ -52,51 +60,13 @@ function createToy(event) {
 
   fetch("http://localhost:3000/toys", configObj)
     .then((resp) => resp.json())
-    .then((object) => { createToyCard(object) })
+    .then((object) => { 
+      let t = new Toy(object)
+      t.createCard() 
+    })
     .catch((error) => { console.log(error.message) })
     
     //clear form
   nameInput.value = ""
   imageInput.value = ""
 };
-
-function createCard(toy) {
-  // make a div with class card
-  const card = document.createElement('div')
-    card.classList.add('card')
-  const h2 = document.createElement('h2')
-    h2.innerText = toy.name
-  const image = document.createElement('img')
-    image.classList.add('toy-avatar')
-    image.src = toy.image
-  const para = document.createElement('p')
-    para.innerText = `${toy.likes} Likes`
-  const button = document.createElement('button')
-    button.classList.add('like-btn')
-    button.innerText = "Like <3"
-  toyCollection.appendChild(card)
-  card.appendChild(h2)
-  card.appendChild(image)
-  card.appendChild(para)
-  card.appendChild(button)
-  button.addEventListener('click', (e) => updateLike(e, toy))
-};
-
-function updateLike(e, toy) {
-  // needs to increase by every click & capture how many likes there are
-  // update innerText & our database
-  toy.likes++
-  //let totalLikes = toy.likes
-  //totalLikes++;
-  //toy.likes = totalLikes
-  e.target.parentElement.querySelector('p').innerText = `${toy.likes} likes`
-
-  fetch(`http://localhost:3000/toys/${toy.id}`, {
-    method: 'PATCH',
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({"likes": toy.likes})
-  }) 
-  .then(res => res.json())
-  .then(json => totalLikes)// you are here
-};
-
